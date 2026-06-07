@@ -167,18 +167,53 @@
 
   /* PRINT */
   @media print{
-    @page{ size:Letter; margin:0.55in; }
-    body{ background:#fff; padding:0; }
+    @page{ size:Letter; margin:0.45in; }
+    html,body{ background:#fff !important; padding:0; margin:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     .toolbar{ display:none !important; }
+    .btn{ display:none !important; }
     .sheet{ box-shadow:none; border:none; max-width:none; padding:0; }
     .sheet::before{ display:none; }
-    .field.active .inp, .field.active .bullets{ font-size:16px; padding:9px 11px; box-shadow:none; border-color:#BBB; }
-    .field.active{ transform:none; }
     .inp, ul.bullets, .underline{ background:#fff; }
-    .section{ break-inside:avoid; }
-    .sec-head{ break-after:avoid; }
-    .ann-ph{ display:none; }
-    .btn{ display:none; }
+
+    /* hide placeholder text on blank fields when printing */
+    .inp::placeholder, .underline::placeholder{ color:transparent !important; }
+    .ann-ph{ display:none !important; }
+
+    /* cancel any leftover focus-zoom */
+    .field.active{ transform:none; }
+    .field.active .inp, .field.active .bullets{ font-size:11px; padding:3px 6px; box-shadow:none; border-color:#BBB; }
+    .field.active label.flab{ color:var(--muted); }
+
+    /* compact everything so it fits without gaps */
+    .kicker{ font-size:8px; letter-spacing:.22em; margin-bottom:2px; }
+    h1{ font-size:21px; margin:0; }
+    .meet-meta{ margin-top:6px; gap:12px; }
+    .timewin{ font-size:12px; }
+    .rule{ margin:8px 0 2px; }
+
+    .section{ padding:5px 0 1px; break-inside:auto; }
+    .sec-head{ padding-bottom:3px; break-after:avoid; }
+    .time, .sec-title{ font-size:13px; }
+    .dur{ font-size:9px; }
+
+    .say{ font-size:10px; line-height:1.28; margin:4px 0 4px; padding-left:9px; border-left-width:2px; }
+
+    .field{ margin:3px 0; }
+    label.flab{ font-size:8.5px; letter-spacing:.08em; margin-bottom:1px; }
+    .inp{ font-size:11px; padding:3px 6px; border-radius:4px; }
+    .row{ gap:10px; }
+    ul.bullets{ font-size:11px; padding:4px 6px 4px 22px; min-height:0; }
+    ul.bullets li{ margin:0; }
+    .hashwrap .inp{ padding-left:16px; }
+    .hashwrap::before{ left:6px; }
+
+    .end{ margin-top:8px; padding-top:6px; break-inside:avoid; }
+    .end .big{ font-size:12px; }
+    .end .note{ font-size:9.5px; margin-top:1px; }
+
+    /* avoid splitting small atoms, but let sections flow to fill pages */
+    .say{ break-inside:avoid; }
+    .field{ break-inside:avoid; }
   }
 </style>
 </head>
@@ -309,7 +344,7 @@
 </div>
 
 <div class="toolbar">
-  <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+  <button class="btn btn-primary" onclick="printForm()">Print / Save as PDF</button>
   <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
 </div>
 
@@ -353,6 +388,27 @@
   });
   form.addEventListener('focusout', e=>{
     const f=e.target.closest('.field'); if(f) setTimeout(()=>f.classList.remove('active'),60);
+  });
+
+  // Reliable printing: strip placeholders + overlay so blanks print clean
+  function printForm(){
+    const phEls=[...document.querySelectorAll('[placeholder]')];
+    phEls.forEach(el=>{ el.dataset._ph=el.getAttribute('placeholder'); el.setAttribute('placeholder',''); });
+    annPh.style.display='none';
+    clearActive();
+    window.print();
+    setTimeout(()=>{
+      phEls.forEach(el=>{ if(el.dataset._ph!=null){ el.setAttribute('placeholder', el.dataset._ph); delete el.dataset._ph; } });
+      updPh();
+    }, 600);
+  }
+  window.addEventListener('beforeprint', ()=>{
+    document.querySelectorAll('[placeholder]').forEach(el=>{ if(el.dataset._ph==null){ el.dataset._ph=el.getAttribute('placeholder'); el.setAttribute('placeholder',''); } });
+    annPh.style.display='none';
+  });
+  window.addEventListener('afterprint', ()=>{
+    document.querySelectorAll('[data-_ph]').forEach(el=>{ el.setAttribute('placeholder', el.dataset._ph); delete el.dataset._ph; });
+    updPh();
   });
 
   // Clear / reset
