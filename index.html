@@ -129,6 +129,7 @@
   /* Announcements bulleted, auto-expanding */
   .ann-wrap{ position:relative; }
   ul.bullets{
+    -webkit-user-select:text; user-select:text; -webkit-touch-callout:default;
     margin:0; padding:10px 12px 10px 30px; min-height:46px;
     list-style:disc; list-style-position:outside;
     font-family:"Spline Sans",sans-serif; font-size:16px; color:var(--ink);
@@ -216,7 +217,7 @@
       <div class="field">
         <label class="flab">Announcements</label>
         <div class="ann-wrap">
-          <ul class="bullets" id="ann"><li><br></li></ul>
+          <ul class="bullets" id="ann" contenteditable="true" role="textbox" aria-label="Announcements"><li><br></li></ul>
           <div class="ann-ph" id="annPh">Type an announcement, press Enter for the next…</div>
         </div>
       </div>
