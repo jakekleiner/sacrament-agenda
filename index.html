@@ -412,14 +412,42 @@
     updPh();
   });
 
-  // Clear / reset
+  // Clear / reset (the only thing that erases saved data)
   function clearForm(){
+    if(!confirm('Clear all entries and start a new week? This cannot be undone.')) return;
     form.querySelectorAll('input, textarea').forEach(el=>{ el.value=''; if(el.classList.contains('grow')) autoGrow(el); });
     document.getElementById('date').value='';
     ann.innerHTML='<li><br></li>'; updPh();
     clearActive();
+    try{ localStorage.removeItem(STORE); }catch(e){}
     window.scrollTo({top:0, behavior:'smooth'});
   }
+
+  // ---- Auto-save: keeps your entries on this device until you Clear ----
+  // (Saved locally in this browser only; nothing is uploaded anywhere.)
+  const STORE='parkway_agenda_v2';
+  let saveTimer=null;
+  function ctrls(){ return [...document.querySelectorAll('input, textarea')]; }
+  function saveNow(){
+    try{
+      const d={ ann: ann.innerHTML, f:{} };
+      ctrls().forEach((el,i)=>{ d.f['c'+i]=el.value; });
+      localStorage.setItem(STORE, JSON.stringify(d));
+    }catch(e){}
+  }
+  function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveNow, 250); }
+  function restore(){
+    try{
+      const raw=localStorage.getItem(STORE); if(!raw) return;
+      const d=JSON.parse(raw);
+      if(d && d.f) ctrls().forEach((el,i)=>{ if(d.f['c'+i]!=null) el.value=d.f['c'+i]; });
+      if(d && typeof d.ann==='string' && d.ann.replace(/<[^>]*>/g,'').trim()!=='') ann.innerHTML=d.ann;
+      document.querySelectorAll('textarea.grow').forEach(autoGrow);
+      updPh();
+    }catch(e){}
+  }
+  document.addEventListener('input', scheduleSave);
+  restore();
 </script>
 </body>
 </html>
