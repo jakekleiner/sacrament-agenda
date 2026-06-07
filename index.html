@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Sacrament Meeting Agenda — Parkway Ward</title>
+<meta name="apple-mobile-web-app-title" content="Sacrament Agenda">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2E5496">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,500&family=Spline+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF8F1; --ink:#26303B; --muted:#857C6E; --navy:#2E5496;
+    --brass:#9C7A3C; --rule:#E5DECF; --field:#FFFFFF; --ring:rgba(46,84,150,.22);
+    --shadow:0 18px 50px rgba(40,34,22,.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #FFFDF7 0%, transparent 60%),
+      #ECE6D8;
+    color:var(--ink);
+    font-family:"Spline Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:16px; line-height:1.5;
+    padding:28px 14px 120px;
+    -webkit-text-size-adjust:100%;
+  }
+
+  /* Toolbar */
+  .toolbar{
+    position:fixed; bottom:0; left:0; right:0; z-index:50;
+    display:flex; gap:10px; justify-content:center;
+    padding:14px; background:linear-gradient(to top, rgba(236,230,216,.96), rgba(236,230,216,0));
+  }
+  .btn{
+    font-family:"Spline Sans",sans-serif; font-weight:600; font-size:14px;
+    letter-spacing:.02em; border:none; cursor:pointer; border-radius:999px;
+    padding:13px 22px; transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--navy); color:#fff; box-shadow:0 8px 22px rgba(46,84,150,.32);}
+  .btn-ghost{background:#fff; color:var(--ink); box-shadow:0 4px 14px rgba(0,0,0,.08);}
+
+  /* Sheet */
+  .sheet{
+    max-width:780px; margin:0 auto; background:var(--paper);
+    border-radius:6px; box-shadow:var(--shadow);
+    padding:40px 46px 48px; position:relative;
+    border:1px solid #efe8d9;
+  }
+  .sheet::before{
+    content:""; position:absolute; inset:10px; border:1px solid #EDE4D2;
+    border-radius:3px; pointer-events:none;
+  }
+
+  header{ text-align:center; position:relative; }
+  .kicker{
+    font-family:"Spline Sans",sans-serif; text-transform:uppercase;
+    letter-spacing:.34em; font-size:11px; color:var(--brass); font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:"Fraunces",serif; font-weight:600; font-size:34px;
+    line-height:1.05; margin:0 0 4px; letter-spacing:.01em;
+  }
+  .meet-meta{
+    display:flex; align-items:flex-end; justify-content:center; gap:18px;
+    flex-wrap:wrap; margin-top:14px;
+  }
+  .date-field{ display:flex; align-items:baseline; gap:8px; }
+  .date-field .lab{ font-size:12px; text-transform:uppercase; letter-spacing:.16em; color:var(--muted); }
+  .timewin{
+    font-family:"Fraunces",serif; font-style:italic; color:var(--muted); font-size:16px;
+  }
+  .rule{ height:1px; background:linear-gradient(to right, transparent, var(--rule) 12%, var(--rule) 88%, transparent); margin:22px 0 8px; }
+
+  /* Sections */
+  .section{ padding:14px 0 4px; }
+  .sec-head{ display:flex; align-items:baseline; gap:12px; border-bottom:1px solid var(--rule); padding-bottom:7px; }
+  .time{ font-family:"Fraunces",serif; font-weight:600; font-size:19px; color:var(--navy); min-width:54px; }
+  .sec-title{ font-family:"Fraunces",serif; font-weight:600; font-size:19px; color:var(--ink); flex:1; }
+  .dur{ font-size:12px; color:var(--brass); font-weight:600; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+
+  /* Spoken script */
+  .say{
+    font-family:"Fraunces",serif; font-style:italic; color:#6F665A;
+    font-size:15.5px; line-height:1.45; margin:12px 0 12px;
+    padding:2px 0 2px 14px; border-left:2px solid #E1C99B;
+  }
+
+  /* Fields */
+  .field{ margin:10px 0; transition:transform .16s ease; }
+  label.flab{
+    display:block; font-size:11.5px; text-transform:uppercase; letter-spacing:.13em;
+    color:var(--muted); font-weight:600; margin-bottom:3px;
+  }
+  .inp{
+    width:100%; font-family:"Spline Sans",sans-serif; font-size:16px; color:var(--ink);
+    background:var(--field); border:1px solid #E4DCCB; border-radius:7px;
+    padding:9px 11px; outline:none; transition:all .16s ease; resize:none;
+  }
+  .inp::placeholder{ color:#C3BAA8; }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .row .field{ flex:1; min-width:160px; }
+
+  /* hymn line: number + title */
+  .hymn{ display:flex; gap:12px; align-items:flex-end; }
+  .hymn .num{ width:96px; flex:none; }
+  .hymn .ttl{ flex:1; }
+  .hashwrap{ position:relative; }
+  .hashwrap .inp{ padding-left:24px; }
+  .hashwrap::before{ content:"#"; position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--brass); font-weight:600; pointer-events:none; }
+
+  /* Auto-zoom on focus */
+  .field.active{ transform:none; }
+  .field.active .inp,
+  .field.active .bullets{
+    font-size:20px; padding:14px 14px; border-color:var(--navy);
+    box-shadow:0 0 0 4px var(--ring), 0 10px 24px rgba(46,84,150,.12);
+    background:#fff;
+  }
+  .field.active label.flab{ color:var(--navy); }
+  .field.active .hashwrap::before{ font-size:20px; }
+
+  /* Announcements bulleted, auto-expanding */
+  .ann-wrap{ position:relative; }
+  ul.bullets{
+    margin:0; padding:10px 12px 10px 30px; min-height:46px;
+    list-style:disc; list-style-position:outside;
+    font-family:"Spline Sans",sans-serif; font-size:16px; color:var(--ink);
+    background:var(--field); border:1px solid #E4DCCB; border-radius:7px;
+    outline:none; transition:all .16s ease;
+  }
+  ul.bullets li{ margin:2px 0 2px; padding-left:4px; }
+  ul.bullets li::marker{ color:var(--brass); }
+  .ann-ph{
+    position:absolute; left:30px; top:11px; color:#C3BAA8; pointer-events:none;
+    font-style:italic; font-family:"Fraunces",serif; font-size:15px;
+  }
+  .field.active .ann-ph{ top:15px; font-size:18px; }
+
+  .end{
+    margin-top:22px; padding-top:14px; border-top:1px solid var(--rule);
+    text-align:center;
+  }
+  .end .big{ font-family:"Fraunces",serif; font-weight:600; color:var(--navy); font-size:17px; }
+  .end .note{ font-family:"Fraunces",serif; font-style:italic; color:var(--muted); font-size:13.5px; margin-top:3px; }
+
+  /* date underline input style */
+  .underline{
+    border:none; border-bottom:1px solid #CFC6B4; background:transparent;
+    border-radius:0; padding:2px 4px; min-width:150px; text-align:center;
+    font-family:"Spline Sans",sans-serif; font-size:16px; color:var(--ink); outline:none;
+  }
+  .underline:focus{ border-bottom-color:var(--navy); }
+
+  @media (max-width:560px){
+    body{ padding:14px 8px 120px; }
+    .sheet{ padding:26px 20px 32px; }
+    h1{ font-size:27px; }
+  }
+
+  /* PRINT */
+  @media print{
+    @page{ size:Letter; margin:0.55in; }
+    body{ background:#fff; padding:0; }
+    .toolbar{ display:none !important; }
+    .sheet{ box-shadow:none; border:none; max-width:none; padding:0; }
+    .sheet::before{ display:none; }
+    .field.active .inp, .field.active .bullets{ font-size:16px; padding:9px 11px; box-shadow:none; border-color:#BBB; }
+    .field.active{ transform:none; }
+    .inp, ul.bullets, .underline{ background:#fff; }
+    .section{ break-inside:avoid; }
+    .sec-head{ break-after:avoid; }
+    .ann-ph{ display:none; }
+    .btn{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <div class="kicker">The Church of Jesus Christ of Latter-day Saints</div>
+    <h1>Sacrament Meeting — Parkway Ward</h1>
+    <div class="meet-meta">
+      <div class="date-field">
+        <span class="lab">Date</span>
+        <input class="underline" id="date" placeholder="________________">
+      </div>
+      <span class="timewin">9:00 – 10:00 a.m.</span>
+    </div>
+  </header>
+
+  <div class="rule"></div>
+
+  <form id="form" autocomplete="off" onsubmit="return false">
+
+    <!-- 9:00 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:00</span><span class="sec-title">Welcome &amp; Announcements</span><span class="dur">3 min</span></div>
+      <p class="say">"Welcome to the Parkway Ward sacrament meeting. We are glad to have you with us today."</p>
+      <div class="row">
+        <div class="field"><label class="flab">Presiding</label><input class="inp"></div>
+        <div class="field"><label class="flab">Conducting</label><input class="inp"></div>
+      </div>
+      <div class="field"><label class="flab">Recognize</label><input class="inp" placeholder="visiting authority / high council"></div>
+      <div class="row">
+        <div class="field"><label class="flab">Chorister</label><input class="inp"></div>
+        <div class="field"><label class="flab">Organist</label><input class="inp"></div>
+      </div>
+      <div class="field">
+        <label class="flab">Announcements</label>
+        <div class="ann-wrap">
+          <ul class="bullets" id="ann"><li><br></li></ul>
+          <div class="ann-ph" id="annPh">Type an announcement, press Enter for the next…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9:03 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:03</span><span class="sec-title">Opening Hymn &amp; Invocation</span><span class="dur">4 min</span></div>
+      <div class="field"><label class="flab">Opening Hymn</label>
+        <div class="hymn">
+          <div class="hashwrap num"><input class="inp" placeholder="No."></div>
+          <div class="ttl"><input class="inp" placeholder="Hymn title"></div>
+        </div>
+      </div>
+      <div class="field"><label class="flab">Invocation</label><input class="inp"></div>
+    </div>
+
+    <!-- 9:07 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:07</span><span class="sec-title">Ward &amp; Stake Business</span><span class="dur">5 min</span></div>
+      <p class="say">New members — "Please stand as your name is read. Please show by the uplifted hand as we welcome these members into our ward family."</p>
+      <div class="field"><label class="flab">New Ward Members</label><textarea class="inp grow" rows="1" placeholder="Name(s), or leave blank"></textarea></div>
+      <p class="say">Releasings — "The following have been released from their callings. We propose they be given a vote of thanks for their service; those who wish to express appreciation may do so by the uplifted hand."</p>
+      <div class="field"><label class="flab">Releasings</label><textarea class="inp grow" rows="1" placeholder="Name — calling"></textarea></div>
+      <p class="say">Sustainings — "The following have been called, and we propose that they be sustained. Please stand as your name is read. Those in favor may manifest it by the uplifted hand. Those opposed may also indicate it."</p>
+      <div class="field"><label class="flab">Sustainings</label><textarea class="inp grow" rows="1" placeholder="Name — calling"></textarea></div>
+      <p class="say">Baby blessing (as scheduled) · Stake business (as needed).</p>
+    </div>
+
+    <!-- 9:12 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:12</span><span class="sec-title">Sacrament</span><span class="dur">12 min</span></div>
+      <p class="say">"We will now prepare for the sacrament by singing hymn number ____. Following the hymn, the sacrament will be administered."</p>
+      <div class="field"><label class="flab">Sacrament Hymn</label>
+        <div class="hymn">
+          <div class="hashwrap num"><input class="inp" placeholder="No."></div>
+          <div class="ttl"><input class="inp" placeholder="Hymn title"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9:24 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:24</span><span class="sec-title">Youth Speaker</span><span class="dur">2 min</span></div>
+      <div class="field"><label class="flab">Speaker</label><input class="inp"></div>
+    </div>
+
+    <!-- 9:26 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:26</span><span class="sec-title">First Speaker</span><span class="dur">11 min</span></div>
+      <div class="field"><label class="flab">Speaker</label><input class="inp"></div>
+    </div>
+
+    <!-- 9:37 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:37</span><span class="sec-title">Intermediate Hymn</span><span class="dur">3 min</span></div>
+      <div class="field"><label class="flab">Hymn</label>
+        <div class="hymn">
+          <div class="hashwrap num"><input class="inp" placeholder="No."></div>
+          <div class="ttl"><input class="inp" placeholder="Hymn title"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9:40 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:40</span><span class="sec-title">Concluding Speaker</span><span class="dur">12 min</span></div>
+      <div class="field"><label class="flab">Speaker</label><input class="inp"></div>
+    </div>
+
+    <!-- 9:52 -->
+    <div class="section">
+      <div class="sec-head"><span class="time">9:52</span><span class="sec-title">Closing Hymn &amp; Benediction</span><span class="dur">4 min</span></div>
+      <div class="field"><label class="flab">Closing Hymn</label>
+        <div class="hymn">
+          <div class="hashwrap num"><input class="inp" placeholder="No."></div>
+          <div class="ttl"><input class="inp" placeholder="Hymn title"></div>
+        </div>
+      </div>
+      <div class="field"><label class="flab">Benediction</label><input class="inp"></div>
+    </div>
+
+    <div class="end">
+      <div class="big">9:56 a.m. — Adjourn (planned)</div>
+      <div class="note">Buffer 9:56–10:00 · hard stop 10:00 a.m. if a speaker runs long.</div>
+    </div>
+
+  </form>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+  <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+</div>
+
+<script>
+  // Auto-grow textareas
+  function autoGrow(el){ el.style.height='auto'; el.style.height=(el.scrollHeight)+'px'; }
+  document.querySelectorAll('textarea.grow').forEach(t=>{ autoGrow(t); t.addEventListener('input',()=>autoGrow(t)); });
+
+  // Announcements: bulleted, auto-expanding list
+  const ann=document.getElementById('ann');
+  const annPh=document.getElementById('annPh');
+  function updPh(){ annPh.style.display = (ann.textContent.trim()==='') ? 'block' : 'none'; }
+  ann.addEventListener('input', ()=>{
+    if(!ann.querySelector('li')){ const li=document.createElement('li'); li.innerHTML='<br>'; ann.appendChild(li); }
+    updPh();
+  });
+  ann.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && !e.shiftKey){
+      e.preventDefault();
+      const sel=window.getSelection(); if(!sel.rangeCount) return;
+      let li=sel.anchorNode;
+      while(li && li.nodeName!=='LI') li=li.parentNode;
+      if(!li){ const nl=document.createElement('li'); nl.innerHTML='<br>'; ann.appendChild(nl); placeCaret(nl); updPh(); return; }
+      const nl=document.createElement('li'); nl.innerHTML='<br>';
+      li.after(nl); placeCaret(nl); updPh();
+    }
+  });
+  function placeCaret(node){
+    const r=document.createRange(); r.setStart(node,0); r.collapse(true);
+    const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+  updPh();
+
+  // Auto-zoom: enlarge + center the active field
+  const form=document.getElementById('form');
+  function clearActive(){ document.querySelectorAll('.field.active').forEach(x=>x.classList.remove('active')); }
+  form.addEventListener('focusin', e=>{
+    const f=e.target.closest('.field'); if(!f) return;
+    clearActive(); f.classList.add('active');
+    setTimeout(()=>{ try{ f.scrollIntoView({block:'center', behavior:'smooth'}); }catch(_){} }, 40);
+  });
+  form.addEventListener('focusout', e=>{
+    const f=e.target.closest('.field'); if(f) setTimeout(()=>f.classList.remove('active'),60);
+  });
+
+  // Clear / reset
+  function clearForm(){
+    form.querySelectorAll('input, textarea').forEach(el=>{ el.value=''; if(el.classList.contains('grow')) autoGrow(el); });
+    document.getElementById('date').value='';
+    ann.innerHTML='<li><br></li>'; updPh();
+    clearActive();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+</script>
+</body>
+</html>
